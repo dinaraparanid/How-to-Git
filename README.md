@@ -1,92 +1,220 @@
-# How-to-Git
+# Git для самых маленьких
 
+**Git** - сисетма контроля версий (Version Controll System), позволяющая управлять изменениями в исходном коде на протяжении всего периода разработки. Git хранит исходный код в удаленных репозиториях, с помощью которых возможно откатить изменения до некого снимка исходного кода в прошлом.
 
+P.S. Итоговые алгоритмы поведения в самом низу. Ниже будет теория, чтобы понять, че это такое
 
-## Getting started
+## Git как хостинг
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+Git хостинги (GitHub, GitLab, GitFlic и т.п.) предоставляют разработчику бесплатный хост исходного кода: все файлы и папки с кодом, простые ресурсы (изображения, музыка, шрифты, макеты и т.п.) и скрипты запуска. Стоит заметить, что хостинги ограничивают размер файлов, которые можно хранить - исполняемые бинарные файлы (например, my_game.exe) могут не пройти "модерацию" из-за веса.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+Существует возможность запретить Git передавать файлы, в том числе бинарные или сгенерированные компилятором (например, MyClass.class для JVM), с помощью файла .gitignore. Существует [хороший генератор](https://www.toptal.com/developers/gitignore) для main-stream языков и библиотек, который задает паттерны файлов, нежелательных к отправке. В качестве примера, возьмите [следующий файл] (https://github.com/dinaraparanid/PrimaMobile/blob/master/.gitignore), запрещающий отправку как отдельных файлов с помощью регулярного выражения, так и целых папок.
 
-## Add your files
+## Инициализация репозитория
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+Удаленный репозиторий ининциализируется с помощью выбранного хостинга (GitHub, GitLab и т.п.). В рамках курса мы знакомимся с GitLab, поэтому рассмотрим процесс создания простого репозитория (если он ещё не создан):
 
+1. Перейди на GitLab и нажми на плюс в верхнем левом углу
+2. New project/repository
+3. Create blank project   
+4. Дай имя, укажи все необходимые параметры и тыкай *Create prject*
+
+Ура, репозиторий готов к работе
+
+Перейди на страницу только что созданного репозитория. Скорее всего, будет уже создан простой README.md файл, в котором будет дан гайд того, как этим пользоваться. Рассмотрим процесс локальной конфигурации проекта.
+
+1. Перед началом, добавь всех людей, с которыми ты разрабатываешь проект. Для этого перейди в секцию Manage/Members/Invite members. Добавь всех, кого нужно, указав их роль (скорее всего, developer).
+
+2. Далее следует разрешить необходимым (если не всем) людям коммитить в main/master ветку. Для этого перейди в Settings/Repository/Protected branches и нажми Unprotect
+
+3. Чтобы перенести удаленный репозиторий на свою машину, перейди в папку, где хочешь создать проект.
+
+4. В удаленном репозитории на GitLab зажми конпку *Clone* (горит синим) и скопируй ссылку под *Clone with HTTPS*. Мы будем использовать протокол HTTPS в силу его общей очевидности.
+
+5. Открой консоль и введи следующее:
+
+```Shell
+$ git clone https://gitlab.pg.innopolis.university/a.savchenko/gitlabtest.git # здесь твоя ссылка
 ```
-cd existing_repo
-git remote add origin https://gitlab.pg.innopolis.university/a.savchenko/how-to-git.git
-git branch -M main
-git push -uf origin main
+
+4. Репозиторий скачается и запишется в папку. Можешь приступать к работе!
+
+## Работа с удаленным репозиторием
+
+### Коммиты
+
+**Коммит** - это снимок состояния исходного кода. Каждый коммит идентифицируется хеш-кодом (используется SHA хеш). Сам по себе, коммит - это бинарный файл с очень сложным алгоритмом (подробнее читай самостоятельно), но нам это маловажно. Работает система коммитов следующим образом:
+
+[Commit A] <- [Commit B] <- [Commit C]
+
+A, B, C - это хеш-коды этих коммитов, к которым можно обращаться для доступа к конкретному коммиту.
+
+Чтобы добавить новый коммит, используется следующий алгоритм (просто запомни):
+
+```Shell
+$ git add <файл>
+$ git pull origin main (обновить ветку в соответствиии с удаленной веткой main)
+$ git commit -m "сообщение к коммиту (например, вкусно покушал)"
+$ git push <название_удаленного_репозитория> (после нашего алгоритма выше должен быть origin)  <название_ветки> (на GitLab основная ветка - main, на GitHub - master) (прим. git push origin main)
 ```
 
-## Integrate with your tools
+*Note:* команду *git pull* следует избегать. Подробнее читай в секции о ветвлении. Однако при обновлении ветки через эту же самую удаленную ветку (т.е. обновить master в соответствиии с удаленной origin/master) команда git pull не должна приводить к кривым ситуациям
 
-- [ ] [Set up project integrations](https://gitlab.pg.innopolis.university/a.savchenko/how-to-git/-/settings/integrations)
+*ЕСЛИ СЛУЧИЛАСЬ ОШИБКА НА push*: *git reset HEAD~* (отменить вышесозданный ЛОКАЛЬНЫЙ коммит); далее повторить *git pull* и *git commit*
 
-## Collaborate with your team
+Команда *git add* добавляет файл в *область индексирования* (область файлов, изменения которых зафиксированы и готовы к отправке на удаленный репозиторий через коммит). Если добавлять каждый файл влом, используй *git add --all*
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+Команда *git commit -m "..."* создает коммит на *локальном репозитории* (папка .git). Если необходимо добавить, зафиксировать и закоммитить все возможные файлы, используй *git commit -am "..."* - комбинация add --all и commit -m.
 
-## Test and Deploy
+Команда *git push* отправляет данные на удаленный репозиторий
 
-Use the built-in continuous integration in GitLab.
+### Ветвления
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+VCS Git отличается от остальныйх VCS крайне шустрой и удобной системой параллельной разработки - **ветвлений**. Существует возможность работать над одним проектом в отдельных специфических ветках, имеющих свою историю изменения.
 
-***
+Однако перед этим, введем ещё несколько терминов:
 
-# Editing this README
+**HEAD** - указатель на текущий коммит, в котором мы работаем. Проще говоря - метка "Ты здесь".
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
+**Main/Master ветка** - основная ветка, инициализированная для самого рабочего и проверенного кода. Иными словами, код в ней должен быть максимально адекватным и проверенным.
 
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+Пример ветки:
 
-## Name
-Choose a self-explaining name for your project.
+[Commit A] <- [Commit B] <- [Commit C] - ветка main/master
+		|
+		|
+	      [Commit D] <- [Commit E] - побочная ветка *my_new_feature*
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+Создается ветка из коммита, на который указывает HEAD следующим образом:
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+```Shell
+$ git checkout -b my_new_feature
+```
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+Команда выше позволяет сразу же создать и перейти на новую ветку. Флаг '-b' позволяет создать новую ветку. Без него мы просто переходим на последний коммит в *уже созданной* ветке. Заметь, что в примере выше, в момент создания ветки указатель HEAD находился на коммите B, затем работа в ветке main продолжилась.
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+### Работа с ветками и слияния: pull, merge
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+Если ты забыл, в какой ветке сейчас, или же нужен список всех веток на локальном репозитории:
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+```Shell
+$ git branch
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+  branch1
+  branch2
+* my_new_feature
+  master
+```
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+Работать с побочной веткой можно точно также, как и с веткой main/master:
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+```Shell
+$ git add --all
+$ git commit -m "commit in my branch"
+$ git push origin my_new_feature
+```
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+Стратегия с pull и reset точно такая же, если в вашей ветке работают несколько человек. Однако если ты один работаешь в ветке - это излишне, потому что все изменения у тебя уже есть.
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+#### Обновление веток
 
-## License
-For open source projects, say how it is licensed.
+Профессиональные разработчики избегают явного использования команды *git pull* в силу ее неочевидности в стратегии слияния/перемещения коммитов. Чтобы избежать трагедии (или кучи настроек), будем использовать следующий метод обновления веток:
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+```Shell
+$ git fetch <remote> (origin) <ветка>
+$ git merge <ветка>
+```
+
+Обе команды, как и pull, обновят код в соответствии с удаленной веткой, но сделают это явно. Это рекомендуемая стратегия к обновлению веток. Советую не использовать git pull при получении информации с разных веток. Более того, алгоритм выше применим и к обновлениям в одной ветке, поэтому это универсальный метод. Короче, используй его всегда :}
+
+Эта штука сразу же скачает все обновления с удаленного репозитория из удаленной ветки и обновит твой код в соответствии с последним коммитом в удаленной ветке.
+
+#### Слияние веток
+
+Сначала рассмотрим сценарий, когда *изменения в ветке main (или от той, которая зависит наша ветка) не происходили*, и мы готовы слить текущие нароботки с основной веткой. Перед этим все изменения **необходимо сохранить на нашей удаленной ветке по алгоритму выше**. Алгоритм слияния с основной веткой *ЕСЛИ ИЗМЕНЕНИЙ НЕ БЫЛО* следующий:
+
+```Shell
+$ git checkout main
+$ git merge my_new_feature
+$ git push origin main
+```
+
+Представим, что в примере выше ветка main продолжила эволюцию, однако эти изменения не были зафиксированы в нашей побочной ветке. Если мы постараемся слить нашу ветку, произойдет следующее:
+
+![merge error](git_merge_conflict.png)
+
+Чтобы показать, в чем именно различаются ветки, используется команда git diff:
+
+```Shell
+$ git diff <ветка1> --not <ветка2>
+```
+
+Команда покажет изменения, которые есть в ветке1, но не в ветке2.
+
+![difference](git_diff.png)
+
+Пройдемся по всем конфликтным местам, которые показала команда git dif или git merge. Все конфликтные файлы будут изменены в соответствии со следующей схемой (картинка ниже). Устрани все конфликты и затем продолжи базовый алгоритм. Пример того, как именно необходимо слить все ветки ниже
+
+![merge_conflict_file](merge_conflict_file.png)
+
+![merge solution](git_merge_conflict_solution.png)
+
+Пример того, как это выглядит в итоге: 
+
+[Commit A] <- [Commit B] <- [Commit C] - ветка main/master
+		|              <--------------
+		|                            |
+	      [Commit D] <- [Commit E] <- [Commit F] - побочная ветка "my_new_feature"
+
+Коммит F слил изменения ветки main и my_new_feature
+
+# Алгоритмы для чайников
+
+1. Коммит в текущую ветку
+
+```Shell
+$ git add --all # добавить все измененные файлы в область индексирования
+$ git fetch origin <master> # скачать все изменения, если они были
+$ git merge <master>
+$ git commit -m "скушал пироженку"
+$ # Дополнительно, если облажался:
+$ git reset HEAD~ # затем повторяешь всё, начиная с fetch, параллельно устраняя конфликты, если будут
+$ git push origin <master>
+```
+
+2. Откатить изменения
+
+```Shell
+$ git reset HEAD~ # откатить текущий коммит AKA переназначить HEAD на предыдущий коммит
+$ git reset HEAD~3 # откатиться на 3 коммита назад
+$ git reset HEAD^ # тоже самое, что и HEAD~
+$ git reset HEAD^2 # откатиться ко второму предку (только, если коммит был слит (merged))
+```
+
+3. Создать ветку и что-то добавить
+
+```Shell
+$ git checkout -b branch1
+$ git add --all
+$ git commit -m "лег спатеньки"
+$ git push origin branch1
+```
+
+4. Обновить ветку в соответствии с удаленной веткой (например, обновить в соответствии с master)
+
+```Shell
+$ git fetch origin master
+$ git merge master
+```
+
+5. Слить побочную ветку (перед этим все изменения закоммитить) с веткой main/master
+
+```Shell
+$ git fetch origin master
+$ git merge master
+$ # На этом этапе может быть конфликт, который нужно исправить и закомитить (смотри примеры выше)
+$ git checkout master
+$ git merge branch1
+$ # На этом этапе также может возникнуть конфликт, стратегия идентична
+$ git push origin master
+```
