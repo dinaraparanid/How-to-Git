@@ -158,7 +158,7 @@ $ git diff <ветка1> --not <ветка2>
 
 Пример того, как это выглядит в итоге:
 
-![merged_branches](merged_branches.md)
+![merged_branches](merged_branches.png)
 
 Коммит F слил изменения ветки main и my_new_feature
 
