@@ -80,10 +80,7 @@ VCS Git отличается от остальныйх VCS крайне шуст
 
 Пример ветки:
 
-[Commit A] <- [Commit B] <- [Commit C] - ветка main/master
-		|
-		|
-	      [Commit D] <- [Commit E] - побочная ветка *my_new_feature*
+![two_branches](two_branches.png)
 
 Создается ветка из коммита, на который указывает HEAD следующим образом:
 
@@ -159,12 +156,9 @@ $ git diff <ветка1> --not <ветка2>
 
 ![merge solution](git_merge_conflict_solution.png)
 
-Пример того, как это выглядит в итоге: 
+Пример того, как это выглядит в итоге:
 
-[Commit A] <- [Commit B] <- [Commit C] - ветка main/master
-		|              <--------------
-		|                            |
-	      [Commit D] <- [Commit E] <- [Commit F] - побочная ветка "my_new_feature"
+![merged_branches](merged_branches.md)
 
 Коммит F слил изменения ветки main и my_new_feature
 
